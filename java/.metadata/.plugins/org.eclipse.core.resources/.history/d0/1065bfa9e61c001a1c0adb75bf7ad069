@@ -1,0 +1,298 @@
+package com.webank.webase.GUI;
+
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.Label;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
+import java.util.Objects;
+
+import javax.swing.JFrame;
+import javax.swing.JTextField;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.webank.webase.Application;
+import com.webank.webase.transaction.TransactionParam;
+import com.webank.webase.transaction.TransactionService;
+
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+import javax.swing.JButton;
+
+@SpringBootApplication
+public class GUI extends Frame {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private JFrame window;
+	private Label label1;
+	private JButton signUp;
+	private JFrame page1;
+	private JButton company;
+	private JButton bank;
+	private JTextField nametext;
+	private JFrame Companyregister;
+	private JFrame CompanyQuery;
+	private JTextField numtext;
+	private static ConfigurableApplicationContext applicationContext;
+	public static void main(String[] args) {
+     applicationContext = SpringApplication.run(Application.class, args);
+      //TransactionService tranService = applicationContext.getBean(TransactionService.class);
+      //tranService.sendPostTransaction();
+      GUI gui=new GUI();
+  }
+	public GUI(){
+		//applicationContext = SpringApplication.run(Application.class, args);
+		zeropage();
+	}
+	@Bean
+    public RestTemplate getRestTemplate() {
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setReadTimeout(10000);// ms
+        factory.setConnectTimeout(10000);// ms
+        return new RestTemplate(factory);
+    }
+	public void zeropage() {
+		window= new JFrame("WeBank");
+		window.setLayout(null);
+		window.setSize(600,400);
+		window.setLocationRelativeTo(null);
+		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		window.setResizable(true);
+		
+		label1= new Label("WeBank");
+		label1.setBounds(250,0, 100, 50);
+		Font font=new Font("宋体",Font.PLAIN,25);
+		label1.setFont(font);
+		//label1.setBackground(Color.blue);
+		label1.setAlignment(1);
+		window.add(label1);
+		Label label2=new Label("This is a application to help company transaction");
+		Font font1=new Font("宋体",Font.PLAIN,15);
+		label2.setFont(font1);
+		label2.setBounds(0, 100, 600, 30);
+		label2.setAlignment(1);
+		window.add(label2);
+		
+		signUp=new JButton("进入操作界面");
+		signUp.setSize(200,40);
+		signUp.setLocation(200,200);
+		signUp.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				firstPage();
+			}
+		});
+		window.add(signUp);
+		
+		window.setVisible(true);
+	}
+	public void firstPage() {
+		page1=new JFrame("WeBank");
+		page1.setLayout(null);
+		page1.setSize(600, 400);
+		label1.setBounds(0, 0, 600, 50);
+		label1.setText("Welcome!");
+		page1.add(label1);
+		
+		company=new JButton("公司");
+		company.setSize(200, 100);
+		company.setLocation(90, 150);
+		company.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				companyPage();
+			}
+			
+		});
+		page1.add(company);
+		
+		bank=new JButton("银行");
+		bank.setSize(200,100);
+		bank.setLocation(310, 150);
+		bank.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				bankPage();
+			}
+			
+		});
+		page1.add(bank);
+		
+		page1.setVisible(true);
+		window.setVisible(false);
+	}
+	public void companyPage() {
+		//注册
+		//信息
+		JFrame companypage=new JFrame("Company");
+		companypage.setLayout(null);
+		companypage.setSize(200, 300);
+		
+		JButton register=new JButton("公司注册");
+		register.setSize(100, 50);
+		register.setLocation(50,50);
+		register.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				Companyregister=new JFrame("CompanyRegister");
+				Companyregister.setLayout(null);
+				Companyregister.setSize(300,300);
+				
+				Label label2=new Label("Please input your company name");
+				label2.setBounds(0,20,300,50);
+				label2.setAlignment(1);
+				Companyregister.add(label2);
+			
+				nametext= new JTextField();
+				nametext.setBounds(75, 100, 150, 25);
+				Companyregister.add(nametext);
+				
+				Label name=new Label("name");
+				name.setBounds(10, 100, 55, 25);
+				name.setAlignment(2);
+				Companyregister.add(name);
+				
+				JButton register=new JButton("注册");
+				register.setBounds(100, 150, 100, 25);
+				register.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent arg0) {
+						String str1=nametext.getText();
+						TransactionService tranService = applicationContext.getBean(TransactionService.class);
+						String str2=tranService.sendPostTransaction("register_Company","[\""+str1+"\"]");
+						if(str2!=null) {
+							Label result=new Label(str2);
+							result.setForeground(Color.red);
+							result.setBounds(0, 200, 300, 25);
+							result.setAlignment(1);
+							Companyregister.add(result);
+						}else {
+							Label result=new Label("failed");
+							result.setForeground(Color.red);
+							result.setBounds(0, 200, 300, 25);
+							result.setAlignment(1);
+							Companyregister.add(result);
+						}
+					}
+				});
+				Companyregister.add(register);
+				
+				Companyregister.setVisible(true);
+				
+			}
+			
+		});
+		companypage.add(register);
+		
+		JButton query=new JButton("信息查询");
+		query.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				CompanyQuery=new JFrame("Company Query");
+				CompanyQuery.setSize(300,500);
+				CompanyQuery.setLayout(null);
+				
+				Label num=new Label("编号");
+				num.setBounds(0, 50, 100, 25);
+				num.setAlignment(1);
+				CompanyQuery.add(num);
+				
+				numtext=new JTextField(); 
+				numtext.setBounds(110, 50, 100, 25);
+				CompanyQuery.add(numtext);
+				
+				JButton query=new JButton("查询");
+				query.setBounds(100, 100, 100, 25);
+				query.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent arg0) {
+						// TODO Auto-generated method stub
+						String str1=numtext.getText();
+						TransactionService tranService = applicationContext.getBean(TransactionService.class);
+						List<String> str2=tranService.sendGetTransaction("print_Company","[\""+str1+"\"]");
+						if(str2!=null) {
+							for(int i=0;i<str2.size();i++)
+							System.out.print(str2.get(i));
+						}
+					}
+					
+				});
+				CompanyQuery.add(query);
+				
+				
+				CompanyQuery.setVisible(true);
+			}
+			
+		});
+		query.setSize(100,50);
+		query.setLocation(50, 100);
+		companypage.add(query);
+		
+		JButton  trans=new JButton("交易");
+		trans.setSize(100,50);
+		trans.setLocation(50, 150);
+		companypage.add(trans);
+		
+		companypage.setVisible(true);
+	}
+	public void bankPage() {
+		JFrame bankpage=new JFrame("Bank");
+		bankpage.setLayout(null);
+		bankpage.setSize(200, 250);
+		
+		JButton register=new JButton("银行注册");
+		register.setSize(100, 50);
+		register.setLocation(50,50);
+		register.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				String str1=nametext.getText();
+				TransactionService tranService = applicationContext.getBean(TransactionService.class);
+				String str2=tranService.sendPostTransaction("bank_register","[\""+str1+"\"]");
+				if(str2!=null) {
+					Label result=new Label(str2);
+					result.setForeground(Color.red);
+					result.setBounds(0, 200, 300, 25);
+					result.setAlignment(1);
+					Companyregister.add(result);
+				}else {
+					Label result=new Label("failed");
+					result.setForeground(Color.red);
+					result.setBounds(0, 200, 300, 25);
+					result.setAlignment(1);
+					Companyregister.add(result);
+				}
+			}
+		});
+		bankpage.add(register);
+		
+		JButton query=new JButton("账单保证");
+		query.setSize(100,50);
+		query.setLocation(50, 100);
+		bankpage.add(query);
+		
+		bankpage.setVisible(true);
+	}
+}

@@ -1,0 +1,5 @@
+package com.webank.webase.transaction;
+
+public class GetTransactionParam {
+
+}

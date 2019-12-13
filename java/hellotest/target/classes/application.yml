@@ -1,0 +1,9 @@
+transactionUrl: http://127.0.0.1:5002/WeBASE-Front/trans/handle
+groupId: 1
+userAddress: "0x62cdcf2b956acdfc9bf099c13c269e20ea40cffa"
+useAes: true
+contract:
+  name: WeBank8
+  address: "0xc7723fadef842eb49b7130d07340da5424767dfc"
+  funcName: get
+  funcParam: "[\"abc\"]"
